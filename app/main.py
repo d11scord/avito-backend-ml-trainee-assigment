@@ -1,9 +1,11 @@
-from typing import List
+import asyncio
+from argparse import ArgumentParser
+from typing import List, Optional
 
 from app.matrix import fetch_matrix, snail, clean_matrix
 
 
-async def get_matrix(url: str) -> List[int]:
+async def get_matrix(url: str) -> Optional[List[int]]:
     """
     :param url: URL для загрузки матрицы с сервера
     :return: Список, содержащий результат обхода полученной матрицы по спирали
@@ -11,14 +13,24 @@ async def get_matrix(url: str) -> List[int]:
 
     # Сходить по ссылке.
     # Распарсить числа из символов.
-
     matrix = await fetch_matrix(url)
-    matrix = clean_matrix(matrix)
-    matrix = snail(matrix)
+    if matrix:
+        matrix = clean_matrix(matrix)
+        matrix = snail(matrix)
 
-    print("Here is your beautiful snailed matrix:")
-    print(matrix)
+        print("Here is your beautiful snailed matrix:")
+        print(matrix)
 
-    return matrix
+        return matrix
 
-    # Не забыть про обработку ошибок.
+
+if __name__ == '__main__':
+    arg_parser = ArgumentParser(description="specify source url")
+    arg_parser.add_argument(
+        "url", help="source URL for matrix", type=str,
+    )
+    args = arg_parser.parse_args()
+
+    # url = "https://raw.githubusercontent.com/avito-tech/python-trainee-assignment/main/matrix.txt"
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(get_matrix(args.url))
