@@ -36,8 +36,6 @@ class TestResponses(unittest.TestCase):
 
             self.assertIsNone(response)
 
-    # TODO: сделать тест на содержимое файла
-
 
 if __name__ == '__main__':
     unittest.main()

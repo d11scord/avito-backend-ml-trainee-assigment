@@ -25,12 +25,12 @@ async def get_matrix(url: str) -> Optional[List[int]]:
 
 
 if __name__ == '__main__':
-    arg_parser = ArgumentParser(description="specify source url")
+    arg_parser = ArgumentParser(
+        description="Traverse the matrix in a counterclockwise spiral pattern.")
     arg_parser.add_argument(
         "url", help="source URL for matrix", type=str,
     )
     args = arg_parser.parse_args()
 
-    # url = "https://raw.githubusercontent.com/avito-tech/python-trainee-assignment/main/matrix.txt"
     loop = asyncio.get_event_loop()
     loop.run_until_complete(get_matrix(args.url))
