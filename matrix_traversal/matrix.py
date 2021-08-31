@@ -6,10 +6,12 @@ import aiohttp
 from aiohttp import ClientConnectorError, ServerConnectionError, ServerTimeoutError
 from aiohttp.web_exceptions import HTTPClientError, HTTPServerError
 
+from matrix_traversal.utils import uri_validator
+
 
 async def fetch_matrix(url: str) -> Optional[str]:
     """
-    Функция для похода на сервер
+    Функция для похода на сервер для загрузки матрицы
 
     :param url: Ссылка для загрузки матрицы
     :return: Матрица без форматирования
@@ -17,6 +19,8 @@ async def fetch_matrix(url: str) -> Optional[str]:
 
     if not url:
         return print("ERROR: Необходимо указать ссылку на матрицу")
+    if not uri_validator(url):
+        return print("ERROR: Указана невалидная ссылкаю В ссылке должен быть указан полный путь до ресурса")
 
     # TODO: сделать покрасивее
     try:
@@ -70,8 +74,9 @@ def clean_matrix(raw_matrix_path: str) -> List[List[int]]:
     ]
     matrix = list()
 
-    # Не держим в памяти две матрицы.
+    # Не держим в памяти две матрицы одновременно.
     # Одна постепенно переходит в другую.
+    # TODO: переделать, чтобы держать в памяти только индексы
     while raw_matrix:
         row = raw_matrix.pop(0)
         matrix.append(list(map(int, row)))
