@@ -4,7 +4,7 @@ import unittest
 from aiohttp.web_exceptions import HTTPClientError
 from aioresponses import aioresponses
 
-from app.matrix import fetch_matrix
+from matrix_traversal.matrix import fetch_matrix
 
 
 class TestResponses(unittest.TestCase):

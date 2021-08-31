@@ -2,7 +2,7 @@ import asyncio
 from argparse import ArgumentParser
 from typing import List, Optional
 
-from app.matrix import fetch_matrix, snail, clean_matrix
+from matrix_traversal.matrix import fetch_matrix, snail, clean_matrix
 
 
 async def get_matrix(url: str) -> Optional[List[int]]:
@@ -18,13 +18,10 @@ async def get_matrix(url: str) -> Optional[List[int]]:
         matrix = clean_matrix(matrix)
         matrix = snail(matrix)
 
-        print("Here is your beautiful snailed matrix:")
-        print(matrix)
-
         return matrix
 
 
-if __name__ == '__main__':
+def main():
     arg_parser = ArgumentParser(
         description="Traverse the matrix in a counterclockwise spiral pattern.")
     arg_parser.add_argument(
@@ -33,4 +30,7 @@ if __name__ == '__main__':
     args = arg_parser.parse_args()
 
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(get_matrix(args.url))
+    result = loop.run_until_complete(get_matrix(args.url))
+    if result:
+        print(result)
+    return result

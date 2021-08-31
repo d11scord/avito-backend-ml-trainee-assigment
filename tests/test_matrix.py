@@ -3,7 +3,7 @@ import unittest
 
 from aioresponses import aioresponses
 
-from app.main import get_matrix
+from matrix_traversal.main import get_matrix
 
 
 class TestGetMatrix(unittest.TestCase):
