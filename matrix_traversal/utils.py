@@ -3,12 +3,10 @@
 from urllib.parse import urlparse, ParseResult
 
 
-a = "https://file.txt"
-
-
 def uri_validator(uri: str):
     result: ParseResult = urlparse(uri)
     return result.scheme in ["http", "https"] and all([result.netloc, result.path])
 
 
-print(uri_validator(a))
+def print_error(message: str):
+    print("ERROR:", message)

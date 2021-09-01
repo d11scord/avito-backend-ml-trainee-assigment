@@ -3,10 +3,14 @@ import os
 from typing import List, Optional
 
 import aiohttp
-from aiohttp import ClientConnectorError, ServerConnectionError, ServerTimeoutError
+from aiohttp import (
+    ClientConnectorError,
+    ServerConnectionError,
+    ServerTimeoutError,
+)
 from aiohttp.web_exceptions import HTTPClientError, HTTPServerError
 
-from matrix_traversal.utils import uri_validator
+from matrix_traversal.utils import uri_validator, print_error
 
 
 async def fetch_matrix(url: str) -> Optional[str]:
@@ -18,21 +22,21 @@ async def fetch_matrix(url: str) -> Optional[str]:
     """
 
     if not url:
-        return print("ERROR: Необходимо указать ссылку на матрицу")
+        return print_error("Необходимо указать ссылку на матрицу")
     if not uri_validator(url):
-        return print("ERROR: Указана невалидная ссылкаю В ссылке должен быть указан полный путь до ресурса")
+        return print_error("Указана невалидная ссылка. "
+                           "В ссылке должен быть указан полный путь до ресурса")
 
-    # TODO: сделать покрасивее
     try:
         async with aiohttp.ClientSession() as session:
 
             response = await session.get(url=url)
             if response.status >= 500:
-                print("ERROR [Response status {}]: Сервер недоступен. "
-                      "Попробуйте подключиться позже".format(response.status))
+                print_error("Сервер недоступен. "
+                            "Попробуйте позже".format(response.status))
             elif 400 <= response.status < 500:
-                print("ERROR [Response status {}]: "
-                      "Проверьте введённый URL".format(response.status))
+                print_error("Проверьте введённый URL и "
+                            "соединение с сетью".format(response.status))
             else:
                 # Пишем в файл, потому что вдруг матрица очень большая.
                 raw_matrix_filename = "raw_matrix.txt"
@@ -46,15 +50,15 @@ async def fetch_matrix(url: str) -> Optional[str]:
                 return raw_matrix_filename
 
     except (asyncio.TimeoutError, ServerTimeoutError):
-        print("ERROR: Timeout")
+        print_error("Timeout")
     except HTTPClientError:  # 4xx
-        print("ERROR: Проверьте введённый URL и соединение с сетью")
+        print_error("Проверьте введённый URL и соединение с сетью")
     except (HTTPServerError, ServerConnectionError):  # 5xx
-        print("ERROR: Сервер недоступен. Попробуйте позже")
+        print_error("Сервер недоступен. Попробуйте позже")
     except ClientConnectorError:
-        print("ERROR: Проверьте соединение")
+        print_error("Проверьте соединение")
     except Exception:
-        print("ERROR: Произошло что-то непонятное... Попробуйте ещё раз")
+        print_error("Произошло что-то непонятное... Попробуйте ещё раз")
 
 
 def clean_matrix(raw_matrix_path: str) -> List[List[int]]:
@@ -75,8 +79,7 @@ def clean_matrix(raw_matrix_path: str) -> List[List[int]]:
     matrix = list()
 
     # Не держим в памяти две матрицы одновременно.
-    # Одна постепенно переходит в другую.
-    # TODO: переделать, чтобы держать в памяти только индексы
+    # Одна постепенно "переходит" в другую.
     while raw_matrix:
         row = raw_matrix.pop(0)
         matrix.append(list(map(int, row)))
